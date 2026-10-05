@@ -656,7 +656,8 @@ export async function completeSession(db: DB, studentId: string, sessionId: stri
     if (a.correct) continue;
     const step = d.steps.find((s) => s.id === stepId);
     const opt = step?.options.find((o) => o.id === a.optionId);
-    const label = capabilities.find((c) => c.id === step?.capabilityId)?.knownErrorTypes.find((e) => e.key === opt?.errorKey)?.label;
+    const known = capabilities.find((c) => c.id === step?.capabilityId)?.knownErrorTypes.find((e) => e.key === opt?.errorKey);
+    const label = known ? (known.studentLabel ?? known.label) : undefined;
     if (label) wrongErrors.set(label, (wrongErrors.get(label) ?? 0) + 1);
   }
   const strengthened: string[] = [];

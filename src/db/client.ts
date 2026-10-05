@@ -36,7 +36,7 @@ async function createDb(): Promise<DbState> {
   const dataDir = process.env.PGLITE_DIR ?? path.join(process.cwd(), ".data", "pglite");
   const memory = dataDir === "memory";
   if (!memory) fs.mkdirSync(dataDir, { recursive: true });
-  const client = new PGlite(memory ? undefined : dataDir);
+  const client = new PGlite(memory ? undefined : dataDir, { relaxedDurability: true });
   const db = drizzle(client, { schema }) as unknown as DB;
   const ready = migrate(drizzle(client, { schema }), { migrationsFolder: MIGRATIONS_FOLDER });
   return { db, ready, close: () => client.close() };

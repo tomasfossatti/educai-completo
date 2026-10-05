@@ -9,6 +9,7 @@ import {
   evidenceEvents,
   evidenceSignals,
   experienceDefinitions,
+  experienceSessions,
   experienceSpecs,
   launches,
   profileVersions,
@@ -319,6 +320,37 @@ export async function getTeacherHome(db: DB, teacherId: string, sectionId: strin
       : priorities.length > 0
         ? "low_coverage"
         : "no_attention_required";
+  // Qué cambió después de experiencias recientes: baseline del lanzamiento vs. proyección actual.
+  const recentLaunches = await db
+    .select({ launch: launches, def: experienceDefinitions })
+    .from(launches)
+    .innerJoin(experienceDefinitions, eq(experienceDefinitions.id, launches.experienceDefinitionId))
+    .where(eq(launches.courseSectionId, sectionId))
+    .orderBy(desc(launches.opensAt))
+    .limit(5);
+  const recentChanges: TeacherHomeDTO["recentChanges"] = [];
+  for (const { launch, def } of recentLaunches) {
+    if (def.generationSource === "seed" || now.getTime() - launch.opensAt.getTime() > 14 * 86_400_000) continue;
+    const capId = def.definition.targetCapabilityIds[0];
+    const base = (launch.baseline as Record<string, { numerator: number; denominator: number }>)[capId];
+    const cur = proj.find((p) => p.capabilityId === capId);
+    if (!base || !cur || base.denominator < K || cur.evidenceSufficientCount < K) continue;
+    const [{ n }] = await db
+      .select({ n: sql<number>`count(*)::int` })
+      .from(experienceSessions)
+      .where(and(eq(experienceSessions.launchId, launch.id), eq(experienceSessions.status, "completed")));
+    if (Number(n) < K) continue;
+    recentChanges.push({
+      launchId: launch.id,
+      title: def.title,
+      open: launch.status === "open",
+      capabilityLabel: capById.get(capId)?.shortLabel ?? "",
+      beforePct: Math.round((base.numerator / base.denominator) * 100),
+      afterPct: Math.round((cur.needsReviewCount / cur.evidenceSufficientCount) * 100),
+      beforeN: `${base.numerator}/${base.denominator}`,
+      afterN: `${cur.needsReviewCount}/${cur.evidenceSufficientCount}`,
+    });
+  }
   const sufficientAvg = proj.length ? proj.reduce((s, p) => s + p.evidenceCoverage, 0) / proj.length : 0;
   return {
     section: {
@@ -349,6 +381,7 @@ export async function getTeacherHome(db: DB, teacherId: string, sectionId: strin
       : null,
     coverage: { enrolled: o.enrolledCount, averageCoveragePct: Math.round(sufficientAvg * 100) },
     activeLaunch: openLaunch ? { launchId: openLaunch.launch.id, title: openLaunch.def.title, joinCode: openLaunch.launch.joinCode } : null,
+    recentChanges,
   };
 }
 
@@ -412,7 +445,7 @@ export async function getLearningMap(db: DB, teacherId: string, sectionId: strin
   };
 }
 
-export async function getFindingDetail(db: DB, teacherId: string, sectionId: string, findingId: string, now = new Date()): Promise<FindingDetailDTO> {
+export async function getFindingDetail(db: DB, teacherId: string, sectionId: string, findingId: string): Promise<FindingDetailDTO> {
   await assertTeacherOfSection(db, teacherId, sectionId);
   const [f] = await db.select().from(teacherFindings).where(and(eq(teacherFindings.id, findingId), eq(teacherFindings.courseSectionId, sectionId))).limit(1);
   if (!f) {

@@ -28,21 +28,25 @@ export const SCRUM_ROLE_ERRORS: KnownErrorType[] = [
   {
     key: "sm_prioritizes_backlog",
     label: "Le asigna al Scrum Master decisiones sobre qué entra o qué prioridad tiene el backlog",
+    studentLabel: "le asignaste al Scrum Master decisiones sobre qué entra o qué prioridad tiene el backlog",
     description: "Confunde la facilitación del Scrum Master con la responsabilidad del Product Owner sobre el orden y el contenido del Product Backlog.",
   },
   {
     key: "po_removes_impediments",
     label: "Le asigna al Product Owner la facilitación o la remoción de impedimentos",
+    studentLabel: "le asignaste a la Product Owner la facilitación o la remoción de impedimentos",
     description: "Atribuye al Product Owner tareas de facilitación, coaching o remoción de impedimentos que corresponden al Scrum Master.",
   },
   {
     key: "role_as_manager",
     label: "Trata a un rol de Scrum como un jefe que asigna o controla tareas",
+    studentLabel: "trataste a un rol de Scrum como un jefe que asigna o controla tareas",
     description: "Interpreta al Scrum Master o al Product Owner como un gerente tradicional que reparte trabajo o decide por el equipo.",
   },
   {
     key: "stakeholder_overrides_po",
     label: "Deja que un stakeholder decida la prioridad por encima del Product Owner",
+    studentLabel: "dejaste que alguien externo decidiera la prioridad por encima de la Product Owner",
     description: "Acepta que quien pide una funcionalidad defina directamente su prioridad, salteando al Product Owner.",
   },
 ];
@@ -179,8 +183,8 @@ export const DEMO_CURRICULUM: DemoModule[] = [
                 plannedClassNo: 4,
                 prerequisites: ["CAP-SCRUM-03"],
                 errors: [
-                  { key: "po_assigns_tasks", label: "Cree que el Product Owner asigna tareas o decide cómo construir", description: "Atribuye al Product Owner decisiones técnicas o de asignación que corresponden a los Developers." },
-                  { key: "sm_plans_for_team", label: "Cree que el Scrum Master estima o planifica por el equipo", description: "Atribuye al Scrum Master la estimación o el plan del Sprint, que son de los Developers." },
+                  { key: "po_assigns_tasks", studentLabel: "le asignaste a la Product Owner decisiones de cómo construir o a quién asignar tareas", label: "Cree que el Product Owner asigna tareas o decide cómo construir", description: "Atribuye al Product Owner decisiones técnicas o de asignación que corresponden a los Developers." },
+                  { key: "sm_plans_for_team", studentLabel: "le asignaste al Scrum Master la estimación o el plan del equipo", label: "Cree que el Scrum Master estima o planifica por el equipo", description: "Atribuye al Scrum Master la estimación o el plan del Sprint, que son de los Developers." },
                 ],
                 keywords: ["developers", "estimar", "sprint backlog", "tareas"],
               },
@@ -225,8 +229,8 @@ export const DEMO_CURRICULUM: DemoModule[] = [
                 importance: "high",
                 plannedClassNo: 3,
                 errors: [
-                  { key: "backlogs_same_list", label: "Trata el Product Backlog y el Sprint Backlog como la misma lista", description: "No distingue la lista ordenada de todo el producto del plan del Sprint actual." },
-                  { key: "sprint_backlog_owned_by_po", label: "Cree que el Product Owner decide el contenido del Sprint Backlog", description: "Atribuye al Product Owner el plan del Sprint, que pertenece a los Developers." },
+                  { key: "backlogs_same_list", studentLabel: "trataste el Product Backlog y el Sprint Backlog como la misma lista", label: "Trata el Product Backlog y el Sprint Backlog como la misma lista", description: "No distingue la lista ordenada de todo el producto del plan del Sprint actual." },
+                  { key: "sprint_backlog_owned_by_po", studentLabel: "pensaste que la Product Owner decide el contenido del Sprint Backlog", label: "Cree que el Product Owner decide el contenido del Sprint Backlog", description: "Atribuye al Product Owner el plan del Sprint, que pertenece a los Developers." },
                 ],
                 keywords: ["product backlog", "sprint backlog", "artefacto", "lista"],
               },
@@ -247,8 +251,8 @@ export const DEMO_CURRICULUM: DemoModule[] = [
                 importance: "medium",
                 plannedClassNo: 4,
                 errors: [
-                  { key: "planning_without_goal", label: "Planifica tareas sin definir un objetivo de Sprint", description: "Arma la lista de trabajo sin un objetivo que le dé sentido." },
-                  { key: "planning_by_po_alone", label: "Cree que el Product Owner planifica solo el Sprint", description: "Deja afuera a los Developers de la planificación." },
+                  { key: "planning_without_goal", studentLabel: "planificaste tareas sin definir un objetivo de Sprint", label: "Planifica tareas sin definir un objetivo de Sprint", description: "Arma la lista de trabajo sin un objetivo que le dé sentido." },
+                  { key: "planning_by_po_alone", studentLabel: "dejaste la planificación solo en manos de la Product Owner", label: "Cree que el Product Owner planifica solo el Sprint", description: "Deja afuera a los Developers de la planificación." },
                 ],
                 keywords: ["sprint planning", "planificación", "objetivo"],
               },
@@ -262,8 +266,8 @@ export const DEMO_CURRICULUM: DemoModule[] = [
                 importance: "medium",
                 plannedClassNo: 4,
                 errors: [
-                  { key: "retro_as_blame", label: "Usa la retrospectiva para buscar culpables", description: "Centra la retrospectiva en responsables individuales en lugar de mejoras del proceso." },
-                  { key: "retro_without_actions", label: "Cierra la retrospectiva sin acciones concretas", description: "Identifica problemas pero no acuerda qué cambiar." },
+                  { key: "retro_as_blame", studentLabel: "usaste la retrospectiva para buscar culpables", label: "Usa la retrospectiva para buscar culpables", description: "Centra la retrospectiva en responsables individuales en lugar de mejoras del proceso." },
+                  { key: "retro_without_actions", studentLabel: "cerraste la retrospectiva sin acciones concretas", label: "Cierra la retrospectiva sin acciones concretas", description: "Identifica problemas pero no acuerda qué cambiar." },
                 ],
                 keywords: ["retrospectiva", "mejora continua", "retro"],
               },

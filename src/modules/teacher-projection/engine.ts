@@ -154,7 +154,7 @@ export function computeFindings(inputs: FindingInput[], opts: { assessmentInDays
       out.push({
         capabilityId: f.capabilityId,
         findingType: "low_coverage",
-        headline: `Necesitamos observar mejor ${f.shortLabel} antes de concluir`,
+        headline: `Necesitamos observar mejor “${f.shortLabel}” antes de concluir`,
         detail: `Solo ${a.evidenceSufficientCount} de ${a.enrolledCount} estudiantes tienen evidencia suficiente sobre esta capacidad.`,
         basis: "Con tan poca cobertura, un porcentaje no sería representativo.",
         reasonCodes: ["CLASS_LOW_EVIDENCE_COVERAGE"],

@@ -70,7 +70,8 @@ const daysBetween = (a: Date, b: Date) => Math.ceil((b.getTime() - a.getTime()) 
 const isIntroduced = (c: CapabilityMeta) => c.scheduleStatus !== "not_introduced";
 
 function errorLabel(cap: CapabilityMeta, key: string | null | undefined) {
-  return cap.knownErrorTypes.find((e) => e.key === key)?.label ?? null;
+  const e = cap.knownErrorTypes.find((x) => x.key === key);
+  return e ? (e.studentLabel ?? e.label) : null;
 }
 
 function plural(n: number, one: string, many: string) {
@@ -267,7 +268,7 @@ export function generateSectionCandidates(ctx: SectionRecContext): StudentRecomm
     let short: string;
     let actionType: StudentRecommendationCandidate["actionSpec"]["actionType"];
     if (state === "unknown") {
-      title = format === "decision_scenario" ? `Mostrá cómo aplicás ${cap.shortLabel}` : `Explicá con tus palabras: ${cap.shortLabel}`;
+      title = format === "decision_scenario" ? `Probalo en situaciones: ${cap.shortLabel}` : `Explicá con tus palabras: ${cap.shortLabel}`;
       code = "INSUFFICIENT_EVIDENCE";
       short = "Todavía no tenemos evidencia sobre esta capacidad.";
       actionType = "diagnostic_probe";
@@ -282,7 +283,7 @@ export function generateSectionCandidates(ctx: SectionRecContext): StudentRecomm
       short = "Ya lo explicás; falta verte aplicarlo.";
       actionType = "application_challenge";
     } else {
-      title = `Confirmá ${cap.shortLabel} en otra situación`;
+      title = `Confirmá en otra situación: ${cap.shortLabel}`;
       code = "INSUFFICIENT_EVIDENCE";
       short = "Vas bien, pero la evidencia todavía es parcial.";
       actionType = "independent_attempt";

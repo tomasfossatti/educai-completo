@@ -44,6 +44,8 @@ export type TeacherHomeDTO = {
   improvement: { worked: string; mainOpportunity: string; tryNext: string; respondents: number | null } | null;
   coverage: { enrolled: number; averageCoveragePct: number };
   activeLaunch: { launchId: string; title: string; joinCode: string } | null;
+  /** Antes/después de experiencias recientes (agregado, n ≥ 5). */
+  recentChanges: { launchId: string; title: string; open: boolean; capabilityLabel: string; beforePct: number; afterPct: number; beforeN: string; afterN: string }[];
 };
 
 export type CapabilityMapRowDTO = {

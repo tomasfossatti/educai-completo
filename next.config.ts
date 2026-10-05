@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   // se cargan desde node_modules en runtime, sin bundlear.
   serverExternalPackages: ["@electric-sql/pglite", "pg", "unpdf"],
   poweredByHeader: false,
+  devIndicators: false,
   typedRoutes: false,
 };
 

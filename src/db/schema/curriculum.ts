@@ -48,7 +48,8 @@ export const curriculumNodes = pgTable(
   (t) => [index("curriculum_nodes_tree_idx").on(t.curriculumVersionId, t.parentId, t.sortOrder)],
 );
 
-export type KnownErrorType = { key: string; label: string; description: string };
+/** label: redacción para docentes (tercera persona). studentLabel: redacción para el estudiante (segunda persona). */
+export type KnownErrorType = { key: string; label: string; description: string; studentLabel?: string };
 
 export const capabilities = pgTable(
   "capabilities",

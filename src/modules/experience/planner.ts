@@ -23,6 +23,12 @@ export type ScenarioInput = {
   takeaway: string;
 };
 
+/** Orden estable pero no trivial: la opción adecuada no queda siempre primera. */
+export function shuffleStable<T extends { text: string }>(items: T[], seed: string): T[] {
+  const h = (t: string) => createHash("sha256").update(`${seed}:${t}`).digest().readUInt32LE(0);
+  return [...items].sort((a, b) => h(a.text) - h(b.text));
+}
+
 export function bankToInput(s: BankScenario): ScenarioInput {
   return {
     scenarioKey: s.id,
@@ -58,7 +64,7 @@ export function buildDefinition(args: {
     independenceGroup: `g${i + 1}`,
     situation: s.situation,
     question: s.question,
-    options: s.options.map((o, j) => ({
+    options: shuffleStable(s.options, s.scenarioKey).map((o, j) => ({
       id: String.fromCharCode(97 + j),
       text: o.text,
       correct: o.correct,

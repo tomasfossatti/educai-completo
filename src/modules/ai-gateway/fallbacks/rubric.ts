@@ -20,7 +20,7 @@ const RUBRICS: Record<string, Rubric> = {
     ],
     misconceptions: [
       { pattern: /(scrum master|\bsm\b)[^.]{0,60}(prioriz|ordena el backlog|decide qu[eé] (se hace|entra)|define (los )?requisit)/i, errorKey: "sm_prioritizes_backlog" },
-      { pattern: /(product owner|\bpo\b)[^.]{0,60}(impediment|facilit|resuelve (los )?problemas del equipo|coach)/i, errorKey: "po_removes_impediments" },
+      { pattern: /(product owner|\bpo\b)[^.]{0,100}(impediment|facilit|resuelve (los )?problemas del equipo|coach)/i, errorKey: "po_removes_impediments" },
       { pattern: /(scrum master|\bsm\b|product owner|\bpo\b)[^.]{0,40}(jefe|asigna (las )?tareas|manda|controla (a|al) (cada|equipo))/i, errorKey: "role_as_manager" },
     ],
   },

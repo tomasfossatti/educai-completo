@@ -1,7 +1,7 @@
 # Educai — START HERE
 
 **Fecha:** 5 de octubre de 2026  
-**Estado del proyecto:** producto y arquitectura definidos; implementación por comenzar.  
+**Estado del proyecto:** producto y arquitectura definidos; MVP demostrable implementado (ver `docs/implementation/MVP_Demo_Decisions.md`).  
 **Repositorio:** `tomasfossatti/educai-completo`
 
 Este documento existe para que un nuevo chat, desarrollador o agente de código pueda reconstruir rápidamente el estado de Educai sin depender del historial conversacional.
@@ -263,9 +263,7 @@ No migrar a microservicios prematuramente.
 
 ## Código
 
-Todavía no comenzó la implementación del producto.
-
-El repositorio fue preparado primero como fuente de verdad documental.
+Existe un MVP demostrable que recorre el loop central de punta a punta con motores deterministas, vistas de estudiante y docente, y un escenario demo sembrado a través del pipeline real. Instrucciones de instalación en `README.md`, desvíos respecto de la arquitectura de referencia en `docs/implementation/MVP_Demo_Decisions.md` y guion de presentación en `docs/demo/Guion_Demo_MVP.md`.
 
 ---
 

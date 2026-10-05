@@ -69,8 +69,10 @@ export default async function FindingPage({ params }: { params: Promise<{ sectio
               <LinkButton href={`${base}/experiencias/${iv.existingDefinitionId}`} full>
                 Ver experiencia
               </LinkButton>
-            ) : (
+            ) : iv.generationAvailable ? (
               <GenerateExperienceButton sectionId={sectionId} findingId={f.findingId} full />
+            ) : (
+              <p className="rounded-md bg-canvas px-3 py-2 text-sm text-ink-soft">Para generar experiencias de temas nuevos hace falta activar la IA en esta instalación.</p>
             )}
           </div>
         </Card>

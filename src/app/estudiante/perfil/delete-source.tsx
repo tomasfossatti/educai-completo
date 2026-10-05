@@ -18,9 +18,9 @@ export function DeleteSourceButton({ id, title }: { id: string; title: string })
       </Button>
     );
   return (
-    <div className="mt-2 rounded-md border border-error-600/20 bg-error-50 p-3 text-sm">
+    <div className="mt-2 basis-full rounded-md border border-error-600/20 bg-error-50 p-3 text-sm">
       <p>Si eliminás esta conversación, Educai dejará de utilizarla y volverá a calcular los estados que dependían de ella.</p>
-      <div className="mt-2 flex gap-2">
+      <div className="mt-2 flex flex-wrap gap-2">
         <Button
           size="sm"
           variant="danger"

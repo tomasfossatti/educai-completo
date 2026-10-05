@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { headers } from "next/headers";
 import QRCode from "qrcode";
 import { ArrowLeft, ArrowRight, Radio, Telescope } from "lucide-react";
 import { getDb } from "@/db/client";
@@ -7,19 +6,12 @@ import { requireTeacher } from "@/modules/identity/session";
 import { getLaunchLive, getLaunchResult } from "@/modules/experience/service";
 import { demoModeEnabled } from "@/modules/demo/simulate";
 import { DomainError } from "@/modules/shared/errors";
+import { baseUrl } from "@/lib/base-url";
 import { Card, Eyebrow, LinkButton } from "@/ui/primitives";
 import { PrivacyNotice } from "@/ui/academic";
 import { LaunchLive } from "./live";
 
 export const metadata = { title: "Experiencia en vivo" };
-
-async function baseUrl() {
-  if (process.env.APP_BASE_URL) return process.env.APP_BASE_URL.replace(/\/$/, "");
-  const h = await headers();
-  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
-  const proto = h.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
-  return `${proto}://${host}`;
-}
 
 /** T-62 Lanzar · T-63 En vivo · T-64 Resultado "Qué observamos". */
 export default async function LaunchPage({ params }: { params: Promise<{ sectionId: string; launchId: string }> }) {

@@ -1,5 +1,7 @@
-import { ArrowRight, CalendarClock, ClipboardList, Flag, MessageSquareQuote, Radio, Sparkles, TrendingDown, Users } from "lucide-react";
+import QRCode from "qrcode";
+import { ArrowRight, CalendarClock, ClipboardList, Flag, MessageSquareQuote, Radio, Sparkles, TrendingDown, UserPlus, Users } from "lucide-react";
 import { getDb } from "@/db/client";
+import { baseUrl } from "@/lib/base-url";
 import { requireTeacher } from "@/modules/identity/session";
 import { getTeacherHome } from "@/modules/teacher-projection/service";
 import { track } from "@/modules/shared/outbox";
@@ -19,6 +21,9 @@ export default async function TeacherHome({ params }: { params: Promise<{ sectio
   await track(db, "teacher_home_viewed", { userId: user.id, courseSectionId: sectionId, properties: { state: h.state } });
   const base = `/docente/c/${sectionId}`;
   const rec = h.recommended;
+  // Sin evidencia todavía: la primera tarea es sumar estudiantes a la cátedra.
+  const invite = h.state === "no_evidence" ? `${await baseUrl()}/x/${h.section.joinCode}` : null;
+  const inviteQr = invite ? await QRCode.toString(invite, { type: "svg", margin: 1, color: { dark: "#16182b", light: "#ffffff" } }) : null;
 
   return (
     <div className="space-y-6">
@@ -84,8 +89,29 @@ export default async function TeacherHome({ params }: { params: Promise<{ sectio
             <SectionTitle id="necesita">Qué necesita tu aula hoy</SectionTitle>
             {h.state === "no_evidence" && (
               <EmptyState icon={<Sparkles className="size-5" aria-hidden />} title="Todavía no tenemos suficiente evidencia del aula." className="mb-4">
-                No vamos a inventar hallazgos. Una experiencia breve permite observar cómo está tu aula en el tema actual.
+                {h.coverage.enrolled === 0
+                  ? "Cuando tus estudiantes se sumen y hagan una primera actividad, acá vas a ver qué necesita el aula."
+                  : "No vamos a inventar hallazgos. Una experiencia breve permite observar cómo está tu aula en el tema actual."}
               </EmptyState>
+            )}
+            {invite && inviteQr && (
+              <Card className="mb-4 flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+                <div
+                  className="size-28 shrink-0 self-center overflow-hidden rounded-md border border-line bg-white p-1 [&_svg]:size-full"
+                  role="img"
+                  aria-label={`Código QR para unirse a la cátedra con el código ${h.section.joinCode}`}
+                  dangerouslySetInnerHTML={{ __html: inviteQr }}
+                />
+                <div className="min-w-0 space-y-1">
+                  <p className="inline-flex items-center gap-1.5 font-semibold">
+                    <UserPlus className="size-4 text-brand-600" aria-hidden /> Invitá a tus estudiantes
+                  </p>
+                  <p className="text-[15px] text-ink-soft">
+                    Que escaneen el QR o entren a Educai con el código <strong className="font-mono text-ink">{h.section.joinCode}</strong>.
+                  </p>
+                  <p className="break-all text-sm text-ink-muted">{invite}</p>
+                </div>
+              </Card>
             )}
             {h.state === "low_coverage" && (
               <p className="mb-3 rounded-md bg-unknown-50 px-3 py-2 text-sm text-ink-soft">Tenemos señales, pero todavía cubren a pocos estudiantes.</p>
@@ -94,7 +120,7 @@ export default async function TeacherHome({ params }: { params: Promise<{ sectio
               <EmptyState title="No aparece una dificultad prioritaria con la evidencia actual." action={<LinkButton href={`${base}/preparar`} variant="secondary">Preparar próxima clase</LinkButton>} />
             )}
             <div className="space-y-3">
-              {h.priorities.map((f, i) => (
+              {h.state !== "no_evidence" && h.priorities.map((f, i) => (
                 <FindingCard key={f.findingId} f={f} href={`${base}/hallazgos/${f.findingId}`} primary={i === 0 && f.type === "needs_review"} />
               ))}
             </div>
@@ -121,12 +147,16 @@ export default async function TeacherHome({ params }: { params: Promise<{ sectio
                       </LinkButton>
                     ) : rec.existingDefinitionId ? (
                       <LinkButton href={`${base}/experiencias/${rec.existingDefinitionId}`}>Ver experiencia</LinkButton>
-                    ) : (
+                    ) : rec.generationAvailable ? (
                       <GenerateExperienceButton sectionId={sectionId} findingId={rec.findingId} label="Generar experiencia" />
+                    ) : (
+                      <p className="rounded-md bg-canvas px-3 py-2 text-sm text-ink-soft">Para generar experiencias de temas nuevos hace falta activar la IA en esta instalación.</p>
                     )}
-                    <LinkButton href={`${base}/hallazgos/${rec.findingId}`} variant="ghost">
-                      Ver evidencia del hallazgo
-                    </LinkButton>
+                    {h.state !== "no_evidence" && (
+                      <LinkButton href={`${base}/hallazgos/${rec.findingId}`} variant="ghost">
+                        Ver evidencia del hallazgo
+                      </LinkButton>
+                    )}
                   </div>
                 </div>
               </Card>

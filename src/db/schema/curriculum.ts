@@ -2,6 +2,7 @@ import { integer, jsonb, pgTable, primaryKey, text, uniqueIndex, uuid, index } f
 import { sql } from "drizzle-orm";
 import type { CognitiveLevel, Importance } from "@/modules/shared/enums";
 import { createdAt, id, ts } from "./_shared";
+import type { DraftCurriculum } from "@/modules/curriculum/extract";
 import { courseSections } from "./identity";
 
 // ── Curriculum (DM §5) ──────────────────────────────────────────────────────
@@ -16,6 +17,9 @@ export const curriculumVersions = pgTable(
       .notNull()
       .default("draft"),
     source: text("source").$type<"seed" | "program_upload" | "teacher">().notNull().default("teacher"),
+    /** Propuesta editable antes de activar (PATCH curriculum/draft, API:473-479). */
+    draft: jsonb("draft").$type<DraftCurriculum>(),
+    extractor: text("extractor"),
     activatedAt: ts("activated_at"),
     createdAt: createdAt(),
   },

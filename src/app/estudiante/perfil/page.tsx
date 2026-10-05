@@ -91,9 +91,9 @@ export default async function PerfilPage() {
         <Card className="divide-y divide-line">
           {sources.map((s) => (
             <div key={s.id} className="px-4 py-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="font-semibold leading-snug">{s.title}</p>
+              <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold leading-snug [overflow-wrap:anywhere]">{s.title}</p>
                   <p className="text-sm text-ink-muted">
                     {s.typeLabel} · {s.subjectName} · {fmt(new Date(s.createdAt))} · {s.evidenceCount} {s.evidenceCount === 1 ? "evidencia" : "evidencias"}
                   </p>

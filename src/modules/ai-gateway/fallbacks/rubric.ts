@@ -7,7 +7,20 @@ import type { CognitiveLevel, Performance } from "@/modules/shared/enums";
  * que el Evidence Engine no usa para cambiar estados.
  */
 
-type Rubric = { required: RegExp[][]; misconceptions: { pattern: RegExp; errorKey: string }[] };
+type RoleMisconception = { role: "po" | "sm" | "any"; pattern: RegExp; errorKey: string };
+type Rubric = { required: RegExp[][]; misconceptions: { pattern: RegExp; errorKey: string }[]; roleMisconceptions?: RoleMisconception[] };
+
+/** Segmentos de texto atribuidos a cada rol: desde su mención hasta la siguiente mención de un rol. */
+function roleSegments(text: string): { role: "po" | "sm"; text: string }[] {
+  const re = /(product owner|\bpo\b|scrum master|\bsm\b)/gi;
+  const hits = [...text.matchAll(re)];
+  return hits.map((m, i) => {
+    const start = m.index ?? 0;
+    const end = i + 1 < hits.length ? (hits[i + 1].index ?? text.length) : Math.min(text.length, start + 200);
+    const role: "po" | "sm" = /scrum master|\bsm\b/i.test(m[0]) ? "sm" : "po";
+    return { role, text: text.slice(start, end) };
+  });
+}
 
 const PO = /(product owner|\bpo\b|dueñ[oa] del producto)/i;
 const SM = /(scrum master|\bsm\b)/i;
@@ -18,10 +31,11 @@ const RUBRICS: Record<string, Rubric> = {
       [PO, /(prioriz|orden|valor|backlog|qu[eé] se (hace|construye)|requisit|necesidad)/i],
       [SM, /(facilit|impediment|obst[aá]cul|coach|acompa|proceso|ayuda al equipo|eventos)/i],
     ],
-    misconceptions: [
-      { pattern: /(scrum master|\bsm\b)[^.]{0,60}(prioriz|ordena el backlog|decide qu[eé] (se hace|entra)|define (los )?requisit)/i, errorKey: "sm_prioritizes_backlog" },
-      { pattern: /(product owner|\bpo\b)[^.]{0,100}(impediment|facilit|resuelve (los )?problemas del equipo|coach)/i, errorKey: "po_removes_impediments" },
-      { pattern: /(scrum master|\bsm\b|product owner|\bpo\b)[^.]{0,40}(jefe|asigna (las )?tareas|manda|controla (a|al) (cada|equipo))/i, errorKey: "role_as_manager" },
+    misconceptions: [],
+    roleMisconceptions: [
+      { role: "sm", pattern: /(prioriz|ordena (el )?backlog|decide qu[eé] (se hace|entra)|define (los )?requisit)/i, errorKey: "sm_prioritizes_backlog" },
+      { role: "po", pattern: /(impediment|facilit|resuelve (los )?problemas del equipo|coach)/i, errorKey: "po_removes_impediments" },
+      { role: "any", pattern: /(jefe|asigna (las )?tareas|\bmanda\b|controla (a|al) (cada|equipo))/i, errorKey: "role_as_manager" },
     ],
   },
   "CAP-SCRUM-01": { required: [[/(valor|prioriz|orden)/i], [/(backlog|producto)/i]], misconceptions: [] },
@@ -29,6 +43,14 @@ const RUBRICS: Record<string, Rubric> = {
   "CAP-SPRINT-01": {
     required: [[/(duraci[oó]n fija|tiempo fijo|timebox|semanas|per[ií]odo|iteraci[oó]n)/i], [/(incremento|entrega|objetivo|producto)/i]],
     misconceptions: [],
+  },
+  "CAP-EV-02": {
+    required: [[/(mejora|mejorar|cambiar|cambio|acci[oó]n|acuerd)/i], [/(proceso|equipo|c[oó]mo trabaj|forma de trabajar)/i]],
+    misconceptions: [{ pattern: /(buscar|encontrar|identificar)[^.]{0,30}(culpa|culpable|responsable)/i, errorKey: "retro_as_blame" }],
+  },
+  "CAP-EV-01": {
+    required: [[/objetivo/i], [/(seleccion|elegi|qu[eé] entra|backlog|capacidad|plan)/i]],
+    misconceptions: [{ pattern: /(product owner|\bpo\b)[^.]{0,40}(planifica sol|arma (el|todo el) plan)/i, errorKey: "planning_by_po_alone" }],
   },
   "CAP-ART-01": {
     required: [[/product backlog/i, /(todo|lista|pendiente|producto|product owner|\bpo\b)/i], [/sprint backlog/i, /(sprint|plan|developers|equipo|seleccion)/i]],
@@ -54,10 +76,13 @@ export function rubricEvaluate(
   }
   const rubric = RUBRICS[capability.stableKey];
   if (rubric) {
-    const mis = rubric.misconceptions.find((m) => m.pattern.test(text) && capability.knownErrorTypes.some((e) => e.key === m.errorKey));
-    if (mis) {
-      const label = capability.knownErrorTypes.find((e) => e.key === mis.errorKey)?.label ?? "error frecuente";
-      return { performance: "incorrect", demonstratedLevel: taskLevel, errorKey: mis.errorKey, mappingConfidence: Math.max(mappingConfidence, 0.8), rationale: `La explicación muestra un error frecuente: ${label.toLowerCase()}.`, paraphrase };
+    const segments = roleSegments(text);
+    const roleMis = rubric.roleMisconceptions?.find((m) => segments.some((sg) => (m.role === "any" || sg.role === m.role) && m.pattern.test(sg.text)));
+    const mis = (roleMis ?? rubric.misconceptions.find((m) => m.pattern.test(text))) as { errorKey: string } | undefined;
+    const known = mis && capability.knownErrorTypes.some((e) => e.key === mis.errorKey) ? mis : undefined;
+    if (known) {
+      const label = capability.knownErrorTypes.find((e) => e.key === known.errorKey)?.label ?? "error frecuente";
+      return { performance: "incorrect", demonstratedLevel: taskLevel, errorKey: known.errorKey, mappingConfidence: Math.max(mappingConfidence, 0.8), rationale: `La explicación muestra un error frecuente: ${label.toLowerCase()}.`, paraphrase };
     }
     const met = rubric.required.filter((group) => group.every((r) => r.test(text))).length;
     if (met === rubric.required.length) {

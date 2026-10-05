@@ -133,6 +133,8 @@ CREATE TABLE "curriculum_versions" (
 	"version_no" integer NOT NULL,
 	"status" text DEFAULT 'draft' NOT NULL,
 	"source" text DEFAULT 'teacher' NOT NULL,
+	"draft" jsonb,
+	"extractor" text,
 	"activated_at" timestamp with time zone,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );

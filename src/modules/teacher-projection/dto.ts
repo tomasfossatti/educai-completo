@@ -26,6 +26,8 @@ export type InterventionDTO = {
   existingDefinitionId: string | null;
   existingDefinitionTitle: string | null;
   openLaunchId: string | null;
+  /** Sin IA configurada solo se generan experiencias de capacidades con banco curado. */
+  generationAvailable: boolean;
 };
 
 export type TeacherHomeDTO = {

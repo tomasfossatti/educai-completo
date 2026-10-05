@@ -97,8 +97,10 @@ export default async function PrepareClassPage({ params }: { params: Promise<{ s
                 <LinkButton href={`${base}/experiencias/${rec.existingDefinitionId}`} full>
                   Ver experiencia
                 </LinkButton>
-              ) : (
+              ) : rec.generationAvailable ? (
                 <GenerateExperienceButton sectionId={sectionId} findingId={rec.findingId} label="Crear experiencia" full />
+              ) : (
+                <p className="rounded-md bg-canvas px-3 py-2 text-sm text-ink-soft">Para generar experiencias de temas nuevos hace falta activar la IA en esta instalación.</p>
               )}
             </div>
           </Card>

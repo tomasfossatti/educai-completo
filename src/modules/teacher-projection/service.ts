@@ -19,7 +19,8 @@ import {
 import { ENGINE_PARAMS } from "@/modules/shared/params";
 import { activeEnrollmentIds, assertTeacherOfSection, getSectionOverview, scheduleStatusFor } from "@/modules/academic/service";
 import { getCurriculum, type CapabilityRecord } from "@/modules/curriculum/service";
-import { EXPERIENCE_TITLES } from "@/modules/experience/bank";
+import { EXPERIENCE_TITLES, hasPracticeBank } from "@/modules/experience/bank";
+import { aiEnabled } from "@/modules/ai-gateway/gateway";
 import { emit } from "@/modules/shared/outbox";
 import { aggregateCapability, computeFindings, pct, recommendIntervention, suppress, type FindingInput } from "./engine";
 import type {
@@ -265,6 +266,7 @@ async function interventionFor(db: DB, sectionId: string, finding: typeof teache
     existingDefinitionId: spec?.def.id ?? null,
     existingDefinitionTitle: spec?.def.title ?? null,
     openLaunchId: openLaunch?.id ?? null,
+    generationAvailable: aiEnabled() || hasPracticeBank(cap.stableKey),
   };
 }
 

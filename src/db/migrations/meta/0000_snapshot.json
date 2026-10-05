@@ -1,5 +1,5 @@
 {
-  "id": "47166fdb-3b10-4e76-9b8c-ccc4b6ebd973",
+  "id": "0a2fd212-6342-4c3a-84ab-2aa65a6def38",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1209,6 +1209,18 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'teacher'"
+        },
+        "draft": {
+          "name": "draft",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "extractor": {
+          "name": "extractor",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "activated_at": {
           "name": "activated_at",

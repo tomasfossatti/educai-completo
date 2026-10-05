@@ -41,14 +41,14 @@ describe("Crear cátedra desde el programa", () => {
     });
     sectionId = r.sectionId;
     expect(r.extractor).toBe("heuristic");
-    const draft = await getDraft(db, ids.teacherId!, sectionId);
+    const draft = (await getDraft(db, ids.teacherId!, sectionId))!;
     expect(draft.draft.units).toHaveLength(3);
     // Antes de activar no hay capacidades: la propuesta es solo un borrador.
     expect(await db.select().from(capabilities).where(eq(capabilities.courseSectionId, sectionId))).toHaveLength(0);
   });
 
   it("al activar crea capacidades y la cátedra arranca sin hallazgos inventados", async () => {
-    const draft = await getDraft(db, ids.teacherId!, sectionId);
+    const draft = (await getDraft(db, ids.teacherId!, sectionId))!;
     draft.draft.units[0].topics[0].capabilities[0].statement = "Explicar los valores del Manifiesto ágil";
     await activateDraft(db, ids.teacherId!, sectionId, draft.draft);
     const { capabilities: caps } = await getCurriculum(db, sectionId);

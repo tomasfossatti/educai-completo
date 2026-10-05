@@ -123,8 +123,10 @@ describe("Loop central", () => {
     await closeLaunch(db, ids.teacherId!, launchId);
     const result = await getLaunchResult(db, ids.teacherId!, launchId);
     expect(result.before.ratePct).toBe(44);
-    expect(result.after.ratePct!).toBeLessThan(44);
-    expect(result.after.denominator).toBeGreaterThan(27);
+    // La simulación usa semillas estables: el guion de demo puede citar este resultado.
+    expect(result.after).toMatchObject({ ratePct: 24, numerator: 8, denominator: 34 });
+    const home = await getTeacherHome(db, ids.teacherId!, ids.sectionId!);
+    expect(home.priorities[0].headline).toBe("32% necesita revisar Product Backlog vs. Sprint Backlog");
   });
 
   it("borrar una fuente invalida su evidencia y recalcula", async () => {

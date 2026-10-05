@@ -14,7 +14,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "db:generate": "drizzle-kit generate",
-    "db:reset": "tsx scripts/reset-db.ts",
+    "db:reset": "tsx --conditions=react-server scripts/reset-db.ts",
     "check": "pnpm typecheck && pnpm lint && pnpm test"
   },
   "pnpm": {

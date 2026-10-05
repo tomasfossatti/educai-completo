@@ -56,8 +56,14 @@ export async function simulateLaunchParticipation(db: DB, teacherId: string, lau
         ...(already.length ? [notInArray(users.id, already.map((a) => a.sid))] : []),
       ),
     );
-  const rnd0 = prng(`${launchId}:pick`);
-  const pool = [...candidates].sort(() => rnd0() - 0.5);
+  // Semillas estables (email + experiencia): después de "Reiniciar demo" la simulación da el mismo resultado.
+  const seedBase = `${def.title}:${d.steps.map((s) => s.scenarioKey).join(",")}`;
+  const rnd0 = prng(`${seedBase}:pick`);
+  const pool = [...candidates]
+    .sort((a, b) => a.email.localeCompare(b.email))
+    .map((c) => ({ c, k: rnd0() }))
+    .sort((a, b) => a.k - b.k)
+    .map((x) => x.c);
   const chosen = pool.slice(0, opts.count ?? Math.min(pool.length, 26));
   if (chosen.length === 0) return { simulated: 0 };
 
@@ -74,7 +80,7 @@ export async function simulateLaunchParticipation(db: DB, teacherId: string, lau
 
   const start = Date.now() - chosen.length * 4 * 60_000; // todo en el pasado reciente
   for (const [n, st] of chosen.entries()) {
-    const rnd = prng(`${launchId}:${st.id}`);
+    const rnd = prng(`${seedBase}:${st.email}`);
     const session = await startLaunchSession(db, st.id, launchId, { simulated: true });
     await db.update(experienceSessions).set({ isSimulated: true }).where(eq(experienceSessions.id, session.id));
     let seq = 0;

@@ -151,7 +151,7 @@ export default async function FindingPage({ params }: { params: Promise<{ sectio
             )}
             {f.audit.otherPatternsSuppressed && <div className="mt-3"><PrivacyNotice>Hay otros patrones con menos de 5 estudiantes: no los mostramos para preservar privacidad.</PrivacyNotice></div>}
             {f.audit.contradictions !== null && (
-              <p className="mt-3 text-sm text-ink-soft">{f.audit.contradictions} estudiantes muestran evidencia contradictoria: explican bien, pero fallan al aplicar.</p>
+              <p className="mt-3 text-sm text-ink-soft">Contando a todo el curso, {f.audit.contradictions} estudiantes explican bien la idea pero fallan al aplicarla en alguna situación, aunque no todos llegan a necesitar revisión.</p>
             )}
           </Card>
           <Card className="p-5">

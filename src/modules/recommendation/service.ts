@@ -291,8 +291,26 @@ export async function getStudentHome(db: DB, studentId: string, now = new Date()
           inArray(recommendations.status, [...ACTIVE]),
         ),
       );
-    if (recs.length === 0) {
-      await regenerateRecommendations(db, studentId, s.section.id, { subjectName: s.subject.name, now });
+    // experience.launch_opened / launch_closed → recommendation.regenerate_requested (API:806-824).
+    const openLaunchIds = (
+      await db.select({ id: launches.id }).from(launches).where(and(eq(launches.courseSectionId, s.section.id), eq(launches.status, "open")))
+    ).map((l) => l.id);
+    const pendingLaunch = openLaunchIds.length
+      ? await db
+          .select({ launchId: experienceSessions.launchId, status: experienceSessions.status })
+          .from(experienceSessions)
+          .where(and(eq(experienceSessions.studentUserId, studentId), inArray(experienceSessions.launchId, openLaunchIds)))
+      : [];
+    const unseenLaunch = openLaunchIds.some(
+      (id) => !recs.some((r) => r.actionSpec.launchId === id) && !pendingLaunch.some((p) => p.launchId === id && p.status === "completed"),
+    );
+    const staleLaunchRec = recs.some((r) => r.actionSpec.launchId && !openLaunchIds.includes(r.actionSpec.launchId));
+    if (recs.length === 0 || unseenLaunch || staleLaunchRec) {
+      await regenerateRecommendations(db, studentId, s.section.id, {
+        subjectName: s.subject.name,
+        now,
+        reason: unseenLaunch ? "Tu docente abrió una actividad para la clase." : staleLaunchRec ? "La actividad de tu docente se cerró." : undefined,
+      });
       recs = await db
         .select()
         .from(recommendations)
